@@ -1,0 +1,9 @@
+.clippy {
+    top: 50px;
+    left: 50px;
+}
+
+#playButton {
+    width: 80%;
+    height: 80%;
+}

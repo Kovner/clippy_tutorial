@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+ <html>
+   <head>
+     <meta charset="utf-8">
+     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+     <title>Clippy Extension</title>
+
+     <script src="./tableau.extensions.1.latest.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> 
+     <script src="./clippy_config.js"></script>
+    <link rel="stylesheet" href="clippy_config.css">
+    <link rel="stylesheet" href="./bootstrap/css/bootstrap.min.css">
+
+
+     </head>
+     <body>
+        <div id = "configApp">
+            <div id = "mainButtons" >
+                <button type="button" class="btn btn-outline-primary" v-on:click="setState('highlight')" :disabled="state!='home'">Highlight</button>
+                <button type="button" class="btn btn-outline-primary" v-on:click="setState('message')" :disabled="state!='home'">Message</button>
+                <button type="button" class="btn btn-outline-primary" v-on:click="setState('challenge')" :disabled="state!='home'">Challenge</button>
+                <!-- <button type="button" class="btn btn-outline-primary" v-on:click="setState('narrative')" :disabled="state!='home'">Describe Data</button> -->
+            </div>
+            <div v-show="state=='highlight'">
+                <!-- <label for="selectedHighlightWorksheet" class="form-label">Worksheet</label> -->
+                <select class="form-select" id="selectedHighlightWorksheet" v-model="selectedHighlightWorksheet">
+                    <option disabled value="">Select a worksheet</option>
+                    <option v-for="ws in worksheetNames">{{ws}}</option>
+                </select>
+                <div>
+                    <button class="btn btn-outline-danger" @click="cancel">Cancel</button>
+                    <button class="btn btn-outline-success" :disabled="selectedHighlightWorksheet == ''" 
+                        v-on:click="submitHighlight()">
+                        Add new highlight
+                    </button>
+                </div>
+            </div>
+            <div class="block_input" v-show="state=='message'">
+                <label class="form-label" for="message">New message: </label>
+                <input class="form-control" id="message" v-model="selectedMessage" type="text" name="message">
+                <div>
+                    <button class="btn btn-outline-danger" @click="cancel">Cancel</button>
+                    <button class="btn btn-outline-success" :disabled="selectedMessage == ''" 
+                        v-on:click="submitMessage()">
+                        Add new message
+                    </button>
+                </div>
+            </div>
+            <div class="block_input" v-show="state=='challenge'">
+                <select class="form-select" v-on:change="handleChallengeWsSelected" v-model="challengeData.worksheet">
+                    <option disabled value="">Select a worksheet</option>
+                    <option v-for="ws in worksheetNames">{{ws}}</option>
+                </select>
+                <!-- <span v-show="challengeData.worksheet != ''">Selected: {{ challengeData.worksheet }}</span> -->
+                <select class="form-select" :disabled="fieldNames.length == 0" v-model="challengeData.field">
+                    <option disabled value="">Select a field</option>
+                    <option v-for="field in fieldNames">{{field}}</option>
+                </select>
+                <!-- <span v-show="challengeData.field != ''">Selected: {{ challengeData[field] }}</span> -->
+                <label class="form-label" for="value">Value: </label>
+                <input class="form-control" :disabled="challengeData.field == ''" id="value" v-model="challengeData.value" type="text" name="value">
+                <div>
+                    <button class="btn btn-outline-danger" @click="cancel">Cancel</button>
+                    <button class="btn btn-outline-success" :disabled="challengeData.value == ''" 
+                        v-on:click="submitChallenge()">
+                        Add new challenge
+                    </button>
+                </div>
+            </div>
+            <div class="block_input"  v-show="state=='narrative'">
+                <select class="form-select" v-model="selectedNarrativeWorksheet">
+                    <option disabled value="">Select a worksheet</option>
+                    <option v-for="ws in worksheetNames">{{ws}}</option>
+                </select>
+                <div>
+                    <button class="btn btn-outline-danger" @click="cancel">Cancel</button>
+                    <button class="btn btn-outline-success" :disabled="selectedNarrativeWorksheet == ''" 
+                        v-on:click="submitNarrative()">
+                        Add data description
+                    </button>
+                </div>
+            </div>
+            <div id = "tutorialDiv">
+                <ul class="list-group list-group-flush" id="tutorialList" v-show="actions.length > 0">
+                    <li class="list-group-item lead" v-for="action in actions">
+                        <b>{{ action.type }}:</b> {{ action.data ? `${action.data.field} = ${action.data.value}` : action.value }}
+                    </li>
+                </ul>
+                <button class="btn btn-success mt-4" :disabled="actions.length == 0" @click="submitTutorial">
+                    Save Tutorial
+                </button>
+            </div>
+        </div>
+     </body>
+ </html>
